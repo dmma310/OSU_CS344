@@ -5,6 +5,7 @@
 
 struct movie* createMovie(char* currLine) {
 	struct movie* currMovie = malloc(sizeof(struct movie));
+	currMovie->numLanguages = 0;
 	// For use with strtok_r
 	char* savePtr;
 
@@ -25,7 +26,7 @@ struct movie* createMovie(char* currLine) {
 	char* languageToken = strtok_r(token, ";", &langPtr);
 	int i = 0;
 	// Loop through each language, from 1 - 5 languages
-	while (languageToken != NULL & i < 6) {
+	while (languageToken != NULL & i < MAX_LANGUAGES) {
 		currMovie->Languages[i] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[i]));
 		int s = strlen(languageToken) - 1;
 		// If one language, format is [some_language]
@@ -48,6 +49,7 @@ struct movie* createMovie(char* currLine) {
 		languageToken = strtok_r(NULL, ";", &langPtr);
 		i += 1;
 	}
+	currMovie->numLanguages = i;
 
 	// The last token
 	token = strtok_r(NULL, ",", &savePtr);

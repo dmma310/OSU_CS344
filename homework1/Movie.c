@@ -14,7 +14,6 @@ int main(int argc, char* argv[])
 	// Get num lines and file name
 	char* menu = "1. Show movies released in the specified year\n2. Show highest rated movie for each year\n3. Show the title and year of release of all movies in a specific language\n4. Exit from the program\n\nEnter a choice from 1 to 4: ";
 	int menuChoice;
-	int caseChoice;
 	int numLines = 0;
 
 	char cwd[2048];
@@ -36,7 +35,8 @@ int main(int argc, char* argv[])
 		case MOVIE_IN_ONE_YEAR:
 		{
 			char* s = "Enter the year for which you want to see movies: ";
-			caseChoice = validateInputInt(s, 1900, 2020);
+			flushStdin();
+			int caseChoice = validateInputInt(s, 1900, 2020);
 			//printf("Enter the year for which you want to see movies: ");
 			//scanf("%d", caseChoice); // Assume valid user input
 			// No input validation needed
@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
 		}
 		//case ALL_MOVIES_BY_YEAR:
 		//{
+		//	flushStdin();
 		//	struct movie* temp = list;
 		//	struct movie* maxPerYear;
 		//	struct movie* movieByYear;
@@ -69,25 +70,35 @@ int main(int argc, char* argv[])
 		//};
 		//break;
 		//}
-		//case ALL_MOVIES_BY_LANGUAGE:
-		//{
-		//	printf("Enter the language for which you want to see movies: ");
-		//	scanf("%s", caseChoice);
-		//	// Find caseChoice (language) in file. If not found, printf:
-		//	struct movie* temp = list;
-		//	int exists = 0;
-		//	while (temp != NULL) {
-		//		if (parseLanguage(temp->Languages, caseChoice) != NULL) {
-		//			printf("%d %s\n", temp->Year, temp->Title); // NEED TO PARSE THIS
-		//			exists = 1;
-		//		};
-		//		temp = temp->next;
-		//	};
-		//	if (!exists) {
-		//		printf("No data about movies released in %s\n", caseChoice);
-		//	}
-		//	break;
-		//}
+		case ALL_MOVIES_BY_LANGUAGE:
+		{
+			char caseChoice[20];
+			flushStdin();
+			printf("Enter the language for which you want to see movies: ");
+			scanf("%s", caseChoice);
+			// Find caseChoice (language) in file. If not found, printf:
+			// No input validation needed
+			// Exact match needed i.e. 'English' != 'english'
+			struct movie* temp = list;
+			int exists = 0;
+			while (temp != NULL) {
+				int i = 0;
+				for (int i = 0; i < temp->numLanguages; ++i) {
+					if (strcmp(temp->Languages[i], caseChoice) == 0) {
+						printf("%d %s\n", temp->Year, temp->Title); // NEED TO PARSE THIS
+						exists = 1;
+						break;
+					}
+				}
+				temp = temp->next;
+			};
+			if (!exists) {
+				printf("No data about movies released in %s\n", caseChoice);
+			}
+			break;
+			printf('\n');
+			printf('\n');
+		}
 		case 4:
 			break;
 		default:

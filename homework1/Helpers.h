@@ -1,10 +1,11 @@
+#define MAX_LANGUAGES 5
 struct movie {
 	char* Title;
 	int Year;
-	char* Languages[5];
+	char* Languages[MAX_LANGUAGES];
 	double Rating;
 	struct movie* next;
-
+	int numLanguages;
 };
 
 struct movie* processFile(char*, int*);
