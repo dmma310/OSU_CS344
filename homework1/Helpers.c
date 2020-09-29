@@ -6,20 +6,20 @@
 struct movie* createMovie(char* currLine) {
 	struct movie* currMovie = malloc(sizeof(struct movie));
 	// For use with strtok_r
-	char* saveptr;
+	char* savePtr;
 
 	// The first token
-	char* token = strtok_r(currLine, ",", &saveptr);
+	char* token = strtok_r(currLine, ",", &savePtr);
 	currMovie->Title = calloc(strlen(token) + 1, sizeof(currMovie->Title)); // Needed if Title is a char*
 	strcpy(currMovie->Title, token);
 
 	// The next token
-	token = strtok_r(NULL, ",", &saveptr);
+	token = strtok_r(NULL, ",", &savePtr);
 	//currMovie->Year = calloc(strlen(token) + 1, sizeof(currMovie->Year));
 	currMovie->Year = atoi(token);
 
 	// The next token
-	token = strtok_r(NULL, ",", &saveptr);
+	token = strtok_r(NULL, ",", &savePtr);
 	//currMovie->Languages = calloc(strlen(token) + 1, sizeof(currMovie->Languages));
 	char* langPtr;
 	char* languageToken = strtok_r(token, ";", &langPtr);
@@ -50,14 +50,23 @@ struct movie* createMovie(char* currLine) {
 	}
 
 	// The last token
-	token = strtok_r(NULL, ",", &saveptr);
+	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Rating = strtod(token, NULL);
 
 	currMovie->next = NULL;
 
+
 	return currMovie;
 };
 
+void freeMovie(struct movie* list) {
+	struct movie* temp;
+	while (list) {
+		temp = list;
+		list = list->next;
+		free(temp);
+	}
+};
 
 struct movie* processFile(char* filePath, int* numLines)
 {
@@ -107,10 +116,10 @@ struct movie* processFile(char* filePath, int* numLines)
 	return head;
 }
 
-void filterChar(char* source, char* destination, char filterChar)
+void filterChar(char* source, char* destination, char comparator)
 {
 	while (*source) { // source != '\0'
-		if (*source != filterChar) {
+		if (*source != comparator) {
 			*destination++ = *source;
 		}
 		source += 1;
@@ -119,21 +128,21 @@ void filterChar(char* source, char* destination, char filterChar)
 }
 
 
-int validate_input_int(const char* menu, const int lbound, const int ubound) {
-	int ret_val;
-
-	int is_valid = scanf("%d", &ret_val);
-	// Doesn't catch 3a, only reads 3 and discards a
-	while (is_valid == 0 || ret_val < lbound || ret_val > ubound) {
+int validateInputInt(const char* menu, const int lbound, const int ubound) {
+	int retVal;
+	printf("%s", menu);
+	int isValid = scanf("%d", &retVal);
+	// Doesn't catch number then character such as 3a, only reads 3 and discards a
+	while (isValid == 0 || retVal < lbound || retVal > ubound) {
 		printf("\nYou entered an incorrect choice. Try again.\n\n");
 		printf("%s", menu);
-		is_valid = scanf("%d", &ret_val);
-		FlushStdin();
+		isValid = scanf("%d", &retVal);
+		flushStdin();
 	};
-	return ret_val;
+	return retVal;
 };
 
-void FlushStdin(void) {
+void flushStdin(void) {
 	int ch;
 	while (((ch = getchar()) != '\n') && (ch != EOF));
 }

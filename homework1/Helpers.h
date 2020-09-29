@@ -12,9 +12,11 @@ struct movie* processFile(char*, int*);
 struct movie* createMovie(char*);
 
 
-int validate_input_int(const char* menu, const int lbound, const int ubound);
+int validateInputInt(const char* menu, const int lbound, const int ubound);
 
-void FlushStdin(void);
+void flushStdin(void);
+
+void freeMovie(struct movie*);
 
 //struct movie* moviesByYear(struct movie*, int);
 //

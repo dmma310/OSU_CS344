@@ -3,49 +3,70 @@
 #include <string.h>
 #include "Helpers.h"
 
-int validate_input_int(const char* menu, const int lbound, const int ubound) {
-	int ret_val;
-
-	int is_valid = scanf("%d", &ret_val);
-	// Doesn't catch 3a, only reads 3 and discards a
-	while (is_valid == 0 || ret_val < lbound || ret_val > ubound) {
-		printf("\nYou entered an incorrect choice. Try again.\n\n");
-		printf("%s", menu);
-		is_valid = scanf("%d", &ret_val);
-		FlushStdin();
-	};
-	return ret_val;
-};
-
 struct movie* createMovie(char* currLine) {
 	struct movie* currMovie = malloc(sizeof(struct movie));
 	// For use with strtok_r
-	char* saveptr;
+	char* savePtr;
 
 	// The first token
-	char* token = strtok_r(currLine, ",", &saveptr);
-	//currMovie->Title = calloc(strlen(token) + 1, sizeof(currMovie->Title)); // Needed if Title is a char*
+	char* token = strtok_r(currLine, ",", &savePtr);
+	currMovie->Title = calloc(strlen(token) + 1, sizeof(currMovie->Title)); // Needed if Title is a char*
 	strcpy(currMovie->Title, token);
 
 	// The next token
-	char* token = strtok_r(NULL, ",", &saveptr);
+	token = strtok_r(NULL, ",", &savePtr);
 	//currMovie->Year = calloc(strlen(token) + 1, sizeof(currMovie->Year));
-	strcpy(currMovie->Year, token);
+	currMovie->Year = atoi(token);
 
 	// The next token
-	char* token = strtok_r(NULL, ",", &saveptr);
+	token = strtok_r(NULL, ",", &savePtr);
 	//currMovie->Languages = calloc(strlen(token) + 1, sizeof(currMovie->Languages));
-	strcpy(currMovie->Languages, token);
+	char* langPtr;
+	char* languageToken = strtok_r(token, ";", &langPtr);
+	int i = 0;
+	// Loop through each language, from 1 - 5 languages
+	while (languageToken != NULL & i < 6) {
+		currMovie->Languages[i] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[i]));
+		int s = strlen(languageToken) - 1;
+		// If one language, format is [some_language]
+		if (languageToken[0] == '[' && languageToken[s] == ']') {
+			// Copy from 2nd character on. Also don't copy last character
+			memcpy(currMovie->Languages[i], &languageToken[1], s - 1);
+			break;
+		}
+		// 1st language
+		else if (languageToken[0] == '[') {
+			filterChar(languageToken, currMovie->Languages[i], '[');
+		}
+		// Last language
+		else if (languageToken[s] == ']') {
+			filterChar(languageToken, currMovie->Languages[i], ']');
+		}
+		else {
+			strcpy(currMovie->Languages[i], languageToken);
+		}
+		languageToken = strtok_r(NULL, ";", &langPtr);
+		i += 1;
+	}
 
 	// The last token
-	char* token = strtok_r(NULL, ",", &saveptr);
+	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Rating = strtod(token, NULL);
 
 	currMovie->next = NULL;
 
+
 	return currMovie;
 };
 
+void freeMovie(struct movie* list) {
+	struct movie* temp;
+	while(list){
+		temp = list;
+		list = list->next;
+		free(temp);
+	}
+};
 
 struct movie* processFile(char* filePath, int* numLines)
 {
@@ -61,7 +82,7 @@ struct movie* processFile(char* filePath, int* numLines)
 	// The tail of the linked list
 	struct movie* tail = NULL;
 
-	// Ignore 1st row
+	// Ignore 1st row (header)
 	len = 256;
 	if ((nread = getline(&currLine, &len, movieFile)) == -1) {
 		printf("Empty file\n");
@@ -88,12 +109,44 @@ struct movie* processFile(char* filePath, int* numLines)
 			tail->next = newNode;
 			tail = newNode;
 		}
-		numLines += 1;
+		*numLines += 1;
 	}
 	free(currLine);
 	fclose(movieFile);
 	return head;
 }
+
+void filterChar(char* source, char* destination, char filterChar)
+{
+	while (*source) { // source != '\0'
+		if (*source != filterChar) {
+			*destination++ = *source;
+		}
+		source += 1;
+	}
+	*destination = '\0'; // Null terminate
+}
+
+
+int validateInputInt(const char* menu, const int lbound, const int ubound) {
+	int retVal;
+	printf("%s", menu);
+	int isValid = scanf("%d", &retVal);
+	// Doesn't catch number then character such as 3a, only reads 3 and discards a
+	while (isValid == 0 || retVal < lbound || retVal > ubound) {
+		printf("\nYou entered an incorrect choice. Try again.\n\n");
+		printf("%s", menu);
+		isValid = scanf("%d", &retVal);
+		flushStdin();
+	};
+	return retVal;
+};
+
+void flushStdin(void) {
+	int ch;
+	while (((ch = getchar()) != '\n') && (ch != EOF));
+}
+
 //
 ///*
 //* Print data for the given movie. Need to pass in which column, then loop and only show column
@@ -182,8 +235,3 @@ struct movie* processFile(char* filePath, int* numLines)
 //	// Assumes valid language is passed i.e. "english" not "e"
 //	return strstr(languages, language);
 //};
-
-void FlushStdin(void) {
-	int ch;
-	while (((ch = getchar()) != '\n') && (ch != EOF));
-}
