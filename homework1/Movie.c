@@ -12,11 +12,10 @@
 
 int main(int argc, char* argv[])
 {
-	// Read File
-	// Get num lines and file name
 	char* menu = "1. Show movies released in the specified year\n2. Show highest rated movie for each year\n3. Show the title and year of release of all movies in a specific language\n4. Exit from the program\n\nEnter a choice from 1 to 4: ";
 	int menuChoice;
 	int numLines = 0;
+	struct movie* list;
 
 	//char cwd[2048];
 	//getcwd(cwd, sizeof(cwd));
@@ -25,27 +24,27 @@ int main(int argc, char* argv[])
 	//strcat(cwd, argv[1]);
 	//printf("%s\n", cwd);
 	//struct movie* list = processFile(cwd, &numLines);
-	struct movie* list;
-	if (!(list = processFile(argv[1], &numLines))) {
+
+	// Read and process file into linked list. Count number of rows (not including header).
+	if (!argv[1] || !(list = processFile(argv[1], &numLines))) {
 		printf("Could not process file %s\n", argv[1]);
 			EXIT_FAILURE;
 	};
 
 	printf("Processed file %s and parsed data for %d movies\n\n", argv[1], numLines);
 
+	// Present menu selection for user.
 	do {
-		menuChoice = validateInputInt(menu, 1, 4);
+		menuChoice = validateInputInt(menu, 1, 4); // Validate input. Assume integer input and only checks integer bounds
 
 		switch (menuChoice)
 		{
+		// Show all movies in user-selected year
 		case MOVIE_IN_ONE_YEAR:
 		{
 			char* s = "Enter the year for which you want to see movies: ";
 			flushStdin();
-			int caseChoice = validateInputInt(s, YEAR_MIN, YEAR_MAX);
-			//printf("Enter the year for which you want to see movies: ");
-			//scanf("%d", caseChoice); // Assume valid user input
-			// No input validation needed
+			int caseChoice = validateInputInt(s, YEAR_MIN, YEAR_MAX); // Validate input. Assume integer input and only checks integer bounds
 			int exists = 0;
 			// Loop through list and only print out matching year
 			struct movie* temp = list;
@@ -65,9 +64,10 @@ int main(int argc, char* argv[])
 		case ALL_MOVIES_BY_YEAR:
 		{
 			flushStdin();
+			// Create linked list of. Each node holds a unique year, title, and rating: <year, <title, rating>>
 			struct keysValue* kv = createKeysValueList(list);
-			printKeysValue(kv);
-			freeKeysValue(kv);
+			printKeysValue(kv); // Display title and highest rating for each year
+			freeKeysValue(kv); // Free dynamically allocated memory
 			printf("\n");
 			break;
 		}
@@ -75,14 +75,15 @@ int main(int argc, char* argv[])
 		{
 			char caseChoice[20];
 			flushStdin();
+			// Find caseChoice (language) in file. If not found, printf:
+			// Assume valid input, so no input validation needed
+			// Exact match needed i.e. 'English' != 'english'
 			printf("Enter the language for which you want to see movies: ");
 			scanf("%s", caseChoice);
-			// Find caseChoice (language) in file. If not found, printf:
-			// No input validation needed
-			// Exact match needed i.e. 'English' != 'english'
 			struct movie* temp = list;
 			int exists = 0;
 			printf("\n");
+			// Loop through each node, identify and print nodes with matching language
 			while (temp != NULL) {
 				for (int i = 0; i < temp->numLanguages; ++i) {
 					if (strcmp(temp->Languages[i], caseChoice) == 0) {
