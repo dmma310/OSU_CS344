@@ -6,6 +6,8 @@
 #define ALL_MOVIES_BY_YEAR 2
 #define ALL_MOVIES_BY_LANGUAGE 3
 #define EXIT_PROGRAM 4
+#define YEAR_MIN 1000
+#define YEAR_MAX 9999
 
 
 int main(int argc, char* argv[])
@@ -16,14 +18,18 @@ int main(int argc, char* argv[])
 	int menuChoice;
 	int numLines = 0;
 
-	char cwd[2048];
-	getcwd(cwd, sizeof(cwd));
-	strcat(cwd, "/vsprojects/homework1/");
-	argv[1] = "movie_sample_1.csv";
-	strcat(cwd, argv[1]);
-	printf("%s\n", cwd);
-	struct movie* list = processFile(cwd, &numLines);
-	//struct movie* list = processFile(argv[1], &numLines);
+	//char cwd[2048];
+	//getcwd(cwd, sizeof(cwd));
+	//strcat(cwd, "/vsprojects/homework1/");
+	//argv[1] = "movie_sample_1.csv";
+	//strcat(cwd, argv[1]);
+	//printf("%s\n", cwd);
+	//struct movie* list = processFile(cwd, &numLines);
+	struct movie* list;
+	if (!(list = processFile(argv[1], &numLines))) {
+		printf("Could not process file %s\n", argv[1]);
+			EXIT_FAILURE;
+	};
 
 	printf("Processed file %s and parsed data for %d movies\n\n", argv[1], numLines);
 
@@ -36,7 +42,7 @@ int main(int argc, char* argv[])
 		{
 			char* s = "Enter the year for which you want to see movies: ";
 			flushStdin();
-			int caseChoice = validateInputInt(s, 1900, 2020);
+			int caseChoice = validateInputInt(s, YEAR_MIN, YEAR_MAX);
 			//printf("Enter the year for which you want to see movies: ");
 			//scanf("%d", caseChoice); // Assume valid user input
 			// No input validation needed
@@ -51,25 +57,20 @@ int main(int argc, char* argv[])
 				temp = temp->next;
 			};
 			if (!exists) {
-				printf("No data about movies released in the year %s\n", caseChoice);
+				printf("No data about movies released in the year %d\n", caseChoice);
 			}
-			printf('\n');
+			printf("\n");
 			break;
 		}
-		//case ALL_MOVIES_BY_YEAR:
-		//{
-		//	flushStdin();
-		//	struct movie* temp = list;
-		//	struct movie* maxPerYear;
-		//	struct movie* movieByYear;
-		//	while (temp) {
-		//		movieByYear = moviesByYear(temp, temp->Year);
-		//		maxPerYear = highestRatingByYear(movieByYear);
-		//		printf("%d 0.1f %s\n", maxPerYear->Year, maxPerYear->Rating, maxPerYear->Title);
-		//		temp = temp->next;
-		//};
-		//break;
-		//}
+		case ALL_MOVIES_BY_YEAR:
+		{
+			flushStdin();
+			struct keysValue* kv = createKeysValueList(list);
+			printKeysValue(kv);
+			freeKeysValue(kv);
+			printf("\n");
+			break;
+		}
 		case ALL_MOVIES_BY_LANGUAGE:
 		{
 			char caseChoice[20];
@@ -81,8 +82,8 @@ int main(int argc, char* argv[])
 			// Exact match needed i.e. 'English' != 'english'
 			struct movie* temp = list;
 			int exists = 0;
+			printf("\n");
 			while (temp != NULL) {
-				int i = 0;
 				for (int i = 0; i < temp->numLanguages; ++i) {
 					if (strcmp(temp->Languages[i], caseChoice) == 0) {
 						printf("%d %s\n", temp->Year, temp->Title); // NEED TO PARSE THIS
@@ -96,10 +97,10 @@ int main(int argc, char* argv[])
 				printf("No data about movies released in %s\n", caseChoice);
 			}
 			break;
-			printf('\n');
-			printf('\n');
+			printf("\n");
+			printf("\n");
 		}
-		case 4:
+		case EXIT_PROGRAM:
 			break;
 		default:
 			break;

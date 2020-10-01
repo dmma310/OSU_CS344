@@ -26,7 +26,7 @@ struct movie* createMovie(char* currLine) {
 	char* languageToken = strtok_r(token, ";", &langPtr);
 	int i = 0;
 	// Loop through each language, from 1 - 5 languages
-	while (languageToken != NULL & i < MAX_LANGUAGES) {
+	while (languageToken != NULL && i < MAX_LANGUAGES) {
 		currMovie->Languages[i] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[i]));
 		int s = strlen(languageToken) - 1;
 		// If one language, format is [some_language]
@@ -61,13 +61,21 @@ struct movie* createMovie(char* currLine) {
 	return currMovie;
 };
 
+void freeChars(struct movie* m) {
+	for (int i = 0; i < m->numLanguages; ++i) {
+		free(m->Languages[i]);
+	}
+}
+
 void freeMovie(struct movie* list) {
 	struct movie* temp;
-	while (list) {
-		temp = list;
+	while ((temp = list) != NULL) {
 		list = list->next;
+		// Free languages
+		freeChars(temp);
 		free(temp);
 	}
+	list = NULL;
 };
 
 struct movie* processFile(char* filePath, int* numLines)
@@ -149,91 +157,68 @@ void flushStdin(void) {
 	while (((ch = getchar()) != '\n') && (ch != EOF));
 }
 
-//
-///*
-//* Print data for the given movie. Need to pass in which column, then loop and only show column
-//*/
-//void printMovie(struct movie* aMovie) {
-//	printf("%s\n", aMovie->Year); // This needs to be parsed [xyz;abc;123]
-//}
-///*
-//* Print the linked list of movies
-//*/
-//void printMovieList(struct movie* list, char* field)
-//{
-//	while (list != NULL)
-//	{
-//		printMovie(list);
-//		list = list->next;
-//	}
-//}
-//
-//
-//
-//
-//
-//// Create new linked list that has all movies with same year
-//struct movie* moviesByYear(struct movie* list, int year) {
-//	//Loop through each movie and add to list if matches year
-//	struct movie* head = list;
-//	struct movie* tail = list;
-//
-//	while (tail != NULL) {
-//		if (tail->Year == year) {
-//			// Get a new movie node corresponding to the current line
-//			struct movie* newNode = createCopyMovie(head);
-//			// This is not the first node.
-//			// Add this node to the list and advance the tail
-//			tail->next = newNode;
-//			tail = newNode;
-//		};
-//
-//		tail = tail->next;
-//	}
-//	return head;
-//}
-//
-//struct movie* highestRatingByYear(struct movie* list) {
-//	struct movie* maxMovie = list;
-//	struct movie* temp = list;
-//
-//	while (temp != NULL) {
-//		if (temp->Rating > maxMovie->Rating) {
-//			maxMovie = temp;
-//		};
-//
-//		temp = temp->next;
-//	}
-//	return maxMovie;
-//};
-//
-//struct movie* createCopyMovie(struct movie* list) {
-//	struct movie* currMovie = malloc(sizeof(struct movie));
-//
-//	// The first token
-//	//currMovie->Title = calloc(strlen(list->Title) + 1, sizeof(char));
-//	strcpy(currMovie->Rating, list->Year);
-//
-//	// The next token
-//	//currMovie->Year = calloc(strlen(list->Year) + 1, sizeof(char));
-//	currMovie->Year = list->Year;
-//
-//	// The next token
-//	//currMovie->Languages = calloc(strlen(list->Languages) + 1, sizeof(char));
-//	strcpy(currMovie->Languages, list->Languages);
-//
-//	// The last token
-//	//currMovie->Rating = calloc(strlen(list->Rating) + 1, sizeof(char));
-//	currMovie->Rating = list->Rating;
-//
-//	currMovie->next = NULL;
-//
-//	return currMovie;
-//};
-//
-//
-//char* parseLanguage(char* languages, char* language) {
-//
-//	// Assumes valid language is passed i.e. "english" not "e"
-//	return strstr(languages, language);
-//};
+struct keysValue* createKeysValueList(struct movie* list) {
+	struct keysValue* head = NULL;
+	struct keysValue* tail = NULL;
+	struct movie* movieList = list;
+	int exists;
+
+	while (movieList != NULL) {
+		if (head == NULL) {
+			struct keysValue* newNode = createKeysValue(movieList);
+			head = newNode;
+			tail = newNode;
+		}
+		else {
+			exists = 0;
+			// Try to find matching/existing movie year, and replace with highest rating if needed
+			while (tail->next) {
+				// If node with existing year exists, set highest rating
+				if ((movieList->Year == tail->yearRating.year)) {
+					if (movieList->Rating > tail->yearRating.rating) {
+						tail->title = movieList->Title;
+						tail->yearRating.rating = movieList->Rating;
+					}
+					exists = 1;
+					break;
+				}
+				tail = tail->next;
+			}
+			// Create new node since current year does not exist
+			if (!exists) {
+				struct keysValue* newNode = createKeysValue(movieList);
+				tail->next = newNode;
+			}
+			tail = head; // rest tail to the beginning
+		}
+		movieList = movieList->next;
+	}
+	return head;
+}
+
+struct keysValue* createKeysValue(struct movie* list) {
+	struct keysValue* temp = malloc(sizeof(struct keysValue));
+	temp->title = list->Title;
+	temp->yearRating.rating = list->Rating;
+	temp->yearRating.year = list->Year;
+	temp->next = NULL;
+	return temp;
+}
+
+void printKeysValue(struct keysValue* list) {
+	struct KeysValue* head = list;
+	while (list) {
+		printf("%d %0.1f %s\n", list->yearRating.year, list->yearRating.rating, list->title);
+		list = list->next;
+	}
+	list = head;
+}
+
+void freeKeysValue(struct keysValue* list) {
+	struct keysValue* temp;
+	while ((temp = list) != NULL) {
+		list = list->next;
+		free(temp);
+	}
+	list = NULL;
+};
