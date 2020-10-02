@@ -3,46 +3,52 @@
 #include <string.h>
 #include "Helpers.h"
 
+
+// Create new movie node
 struct movie* createMovie(char* currLine) {
 	struct movie* currMovie = malloc(sizeof(struct movie));
+	// Count number of languages.
 	currMovie->numLanguages = 0;
 	// For use with strtok_r
 	char* savePtr;
 
-	// The first token
+	// Read and tokenize the line. Expect the following format:
+	// Title<char*>;Year<int>;Languages[language1<char*>;language2<char*>;...language5<char*>];Rating<double>
+
+	// The first token processed. 
 	char* token = strtok_r(currLine, ",", &savePtr);
 	currMovie->Title = calloc(strlen(token) + 1, sizeof(currMovie->Title)); // Needed if Title is a char*
 	strcpy(currMovie->Title, token);
 
-	// The next token
+	// The next token processed. 
 	token = strtok_r(NULL, ",", &savePtr);
-	//currMovie->Year = calloc(strlen(token) + 1, sizeof(currMovie->Year));
 	currMovie->Year = atoi(token);
 
-	// The next token
+	// The next token processed. 
 	token = strtok_r(NULL, ",", &savePtr);
-	//currMovie->Languages = calloc(strlen(token) + 1, sizeof(currMovie->Languages));
 	char* langPtr;
+	// Tokenize language array, which is in the following format: [language1<char*>;language2<char*>;...language5<char*>];Rating<double>
 	char* languageToken = strtok_r(token, ";", &langPtr);
 	int i = 0;
-	// Loop through each language, from 1 - 5 languages
-	while (languageToken != NULL & i < MAX_LANGUAGES) {
+	// Loop through each language, from 1 - 5 languages, and handle each case:
+	while (languageToken != NULL && i < MAX_LANGUAGES) {
 		currMovie->Languages[i] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[i]));
 		int s = strlen(languageToken) - 1;
 		// If one language, format is [some_language]
 		if (languageToken[0] == '[' && languageToken[s] == ']') {
-			// Copy from 2nd character on. Also don't copy last character
+			// Copy from 2nd character on. Also don't copy last character.
 			memcpy(currMovie->Languages[i], &languageToken[1], s - 1);
 			break;
 		}
-		// 1st language
+		// 1st language being processed.
 		else if (languageToken[0] == '[') {
 			filterChar(languageToken, currMovie->Languages[i], '[');
 		}
-		// Last language
+		// Last language being processed.
 		else if (languageToken[s] == ']') {
 			filterChar(languageToken, currMovie->Languages[i], ']');
 		}
+		// All other cases (processing languages in-between)
 		else {
 			strcpy(currMovie->Languages[i], languageToken);
 		}
@@ -50,8 +56,8 @@ struct movie* createMovie(char* currLine) {
 		i += 1;
 	}
 	currMovie->numLanguages = i;
-
-	// The last token
+	
+	// The last token processed. 
 	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Rating = strtod(token, NULL);
 
@@ -61,6 +67,7 @@ struct movie* createMovie(char* currLine) {
 	return currMovie;
 };
 
+// Free memory of movies linked list
 void freeMovie(struct movie* list) {
 	struct movie* temp;
 	while (list) {
@@ -70,6 +77,7 @@ void freeMovie(struct movie* list) {
 	}
 };
 
+// Process csv file. No validation performed (correct number of columns, correct format, etc.).
 struct movie* processFile(char* filePath, int* numLines)
 {
 	// Open the specified file for reading only
@@ -90,24 +98,23 @@ struct movie* processFile(char* filePath, int* numLines)
 		printf("Empty file\n");
 		return head;
 	}
-	// Read the file line by line
+	// Generate linked list of movie nodes by reading the file line by line. Each node holds a record (row) in the csv.
 	while ((nread = getline(&currLine, &len, movieFile)) != -1)
 	{
-		// Get a new movie node corresponding to the current line
+		// Create a new movie node corresponding to the current line
 		struct movie* newNode = createMovie(currLine);
 
 		// Is this the first node in the linked list?
 		if (head == NULL)
 		{
-			// This is the first node in the linked link
-			// Set the head and the tail to this node
+			// Set the head and the tail to this new node
 			head = newNode;
 			tail = newNode;
 		}
 		else
 		{
 			// This is not the first node.
-			// Add this node to the list and advance the tail
+			// Add this node to the list and advance the tail.
 			tail->next = newNode;
 			tail = newNode;
 		}
@@ -118,8 +125,10 @@ struct movie* processFile(char* filePath, int* numLines)
 	return head;
 }
 
+// Copy source to destination, with comparator char removed
 void filterChar(char* source, char* destination, char comparator)
 {
+	// Loop through characters, only copy if character != comparator
 	while (*source) { // source != '\0'
 		if (*source != comparator) {
 			*destination++ = *source;
@@ -129,7 +138,7 @@ void filterChar(char* source, char* destination, char comparator)
 	*destination = '\0'; // Null terminate
 }
 
-
+// Used to validate user integer input. Assumes valid integer input.
 int validateInputInt(const char* menu, const int lbound, const int ubound) {
 	int retVal;
 	printf("%s", menu);
@@ -144,6 +153,7 @@ int validateInputInt(const char* menu, const int lbound, const int ubound) {
 	return retVal;
 };
 
+// Flush STDIN buffer
 void flushStdin(void) {
 	int ch;
 	while (((ch = getchar()) != '\n') && (ch != EOF));
@@ -171,69 +181,72 @@ void flushStdin(void) {
 //
 //
 //
-//
-//// Create new linked list that has all movies with same year
-//struct movie* moviesByYear(struct movie* list, int year) {
-//	//Loop through each movie and add to list if matches year
-//	struct movie* head = list;
-//	struct movie* tail = list;
-//
-//	while (tail != NULL) {
-//		if (tail->Year == year) {
-//			// Get a new movie node corresponding to the current line
-//			struct movie* newNode = createCopyMovie(head);
-//			// This is not the first node.
-//			// Add this node to the list and advance the tail
-//			tail->next = newNode;
-//			tail = newNode;
-//		};
-//
-//		tail = tail->next;
-//	}
-//	return head;
-//}
-//
-//struct movie* highestRatingByYear(struct movie* list) {
-//	struct movie* maxMovie = list;
-//	struct movie* temp = list;
-//
-//	while (temp != NULL) {
-//		if (temp->Rating > maxMovie->Rating) {
-//			maxMovie = temp;
-//		};
-//
-//		temp = temp->next;
-//	}
-//	return maxMovie;
-//};
-//
-//struct movie* createCopyMovie(struct movie* list) {
-//	struct movie* currMovie = malloc(sizeof(struct movie));
-//
-//	// The first token
-//	//currMovie->Title = calloc(strlen(list->Title) + 1, sizeof(char));
-//	strcpy(currMovie->Rating, list->Year);
-//
-//	// The next token
-//	//currMovie->Year = calloc(strlen(list->Year) + 1, sizeof(char));
-//	currMovie->Year = list->Year;
-//
-//	// The next token
-//	//currMovie->Languages = calloc(strlen(list->Languages) + 1, sizeof(char));
-//	strcpy(currMovie->Languages, list->Languages);
-//
-//	// The last token
-//	//currMovie->Rating = calloc(strlen(list->Rating) + 1, sizeof(char));
-//	currMovie->Rating = list->Rating;
-//
-//	currMovie->next = NULL;
-//
-//	return currMovie;
-//};
-//
-//
-//char* parseLanguage(char* languages, char* language) {
-//
-//	// Assumes valid language is passed i.e. "english" not "e"
-//	return strstr(languages, language);
-//};
+
+// Creates a linked list of <year, <title, rating>> nodes from a list of movie nodes. All years are unique with the highest rating stored for that year.
+struct keyValues* createKeysValueList(struct movie* list) {
+	int exists;
+	// Create first node in list
+	struct keyValues* head = createKeysValue(list);
+	struct keyValues* tail = head;
+	struct movie* movieList = list->next;
+
+	// Loop through each remaining movie node and create and add <year, <title, rating>> node to list if unique year.
+	// Else swap info for existing node if new rating is higher.
+	while (movieList) {
+		exists = 0;
+		// Try to find matching/existing movie year, and replace with highest rating if needed
+		while (tail) {
+			// If node with existing year exists, set highest rating
+			if (movieList->Year == tail->year) {
+				if (movieList->Rating > tail->titleRating.rating) {
+					tail->titleRating.title = movieList->Title;
+					tail->titleRating.rating = movieList->Rating;
+				}
+				exists = 1;
+				break;
+			}
+			//ISSUE: Once reaches end, tail becomes null. When creating new node below, how to reference last non-null node?
+			tail = tail->next;
+		}
+		// Create new node and add to list since current year does not exist
+		if (!exists) {
+			struct keyValues* newNode = createKeysValue(movieList);
+			tail->next = newNode;
+		}
+		tail = head; // rest tail to the beginning
+		movieList = movieList->next; //move to next movie node
+	}
+	return head;
+}
+
+// Creates a <year, <title, rating>> struct from movie node
+struct keyValues* createKeysValue(struct movie* list) {
+	struct keyValues* temp = malloc(sizeof(struct keyValues));
+	temp->titleRating.title = malloc(strlen(list->Title));
+	strcpy(temp->titleRating.title, list->Title);
+	//temp->titleRating.title = list->Title; // set pointers equal, both point to same memory
+	temp->titleRating.rating = list->Rating;
+	temp->year = list->Year;
+	temp->next = NULL;
+	return temp;
+}
+
+// Display title and highest rating for each year
+void printKeysValue(struct keyValues* list) {
+	struct keyValues* head = list;
+	while (head) {
+		printf("%d %0.1f %s\n", head->year, head->titleRating.rating, head->titleRating.title);
+		head = head->next;
+	}
+}
+
+// Frees the linked list of nodes containing <year, <title, rating>>
+void freeKeysValue(struct keyValues* list) {
+	struct keyValues* temp;
+	while ((temp = list) != NULL) {
+		list = list->next;
+		free(temp->titleRating.title);
+		free(temp);
+	}
+	list = NULL;
+};
