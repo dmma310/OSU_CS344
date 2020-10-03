@@ -10,8 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-	// Read File
-	// Get num lines and file name
+	// Read File, get num lines and file name
 	char* menu = "1. Show movies released in the specified year\n2. Show highest rated movie for each year\n3. Show the title and year of release of all movies in a specific language\n4. Exit from the program\n\nEnter a choice from 1 to 4: ";
 	int menuChoice;
 	int numLines = 0;
@@ -27,6 +26,7 @@ int main(int argc, char* argv[])
 
 	printf("Processed file %s and parsed data for %d movies\n\n", argv[1], numLines);
 
+	// Provide user with menu options until user decides to quit
 	do {
 		menuChoice = validateInputInt(menu, 1, 4);
 
@@ -96,6 +96,7 @@ int main(int argc, char* argv[])
 		}
 	} while (menuChoice != EXIT_PROGRAM);
 
+	// Free memory/
 	freeMovie(list);
 
 	return 0;

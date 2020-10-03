@@ -73,6 +73,11 @@ void freeMovie(struct movie* list) {
 	while (list) {
 		temp = list;
 		list = list->next;
+		free(temp->Title);
+		//for (int i = 0; i < temp->numLanguages; ++i) {
+		for (int i = 0; i < MAX_LANGUAGES; ++i) {
+			free(temp->Languages[i]);
+		}
 		free(temp);
 	}
 };
@@ -181,12 +186,6 @@ void flushStdin(void) {
 //
 //
 //
-
-/*
-Movie: -^--
-tail:  ^--
-*/
-
 
 // Creates a linked list of <year, <title, rating>> nodes from a list of movie nodes. All years are unique with the highest rating stored for that year.
 struct keyValues* createKeysValueList(struct movie* list) {
