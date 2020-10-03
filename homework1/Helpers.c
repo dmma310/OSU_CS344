@@ -190,7 +190,6 @@ tail:  ^--
 
 // Creates a linked list of <year, <title, rating>> nodes from a list of movie nodes. All years are unique with the highest rating stored for that year.
 struct keyValues* createKeysValueList(struct movie* list) {
-	int exists;
 	// Create first node in list, increment movie pointer to next node
 	struct keyValues* head = createKeysValue(list);
 	struct keyValues* tail = head;
@@ -199,16 +198,16 @@ struct keyValues* createKeysValueList(struct movie* list) {
 	// Loop through each remaining movie node and create and add <year, <title, rating>> node to list if unique year.
 	// Else swap info for existing node if new rating is higher.
 	while (movieList) {
-		exists = 0;
 		// Try to find matching/existing movie year, and replace with highest rating if needed
 		while (tail->next) {
-			// If node with existing year exists, set highest rating
+			// If node with existing year exists, set to higher rating
 			if (movieList->Year == tail->year) {
 				if (movieList->Rating > tail->titleRating.rating) {
-					tail->titleRating.title = movieList->Title;
+					// Ensure adequate memory in source, then copy
+					tail->titleRating.title = realloc(tail->titleRating.title, strlen(movieList->Title));
+					strcpy(tail->titleRating.title, movieList->Title);
 					tail->titleRating.rating = movieList->Rating;
 				}
-				exists = 1;
 				break;
 			}
 			tail = tail->next;
@@ -216,15 +215,15 @@ struct keyValues* createKeysValueList(struct movie* list) {
 		// Loop above stops without checking last node (since tail->next == NULL). Need to check last node in tail list.
 		if (movieList->Year == tail->year) {
 			if (movieList->Rating > tail->titleRating.rating) {
-				tail->titleRating.title = movieList->Title;
+				// Ensure adequate memory in source, then copy
+				tail->titleRating.title = realloc(tail->titleRating.title, strlen(movieList->Title));
+				strcpy(tail->titleRating.title, movieList->Title);
 				tail->titleRating.rating = movieList->Rating;
 			}
-			exists = 1;
-		}
-		// Create new node and add to list since current year does not exist
-		if (!exists) {
-			struct keyValues* newNode = createKeysValue(movieList);
-			tail->next = newNode;
+		} else {
+				// Create new node and add to list since current year does not exist
+				struct keyValues* newNode = createKeysValue(movieList);
+				tail->next = newNode;
 		}
 		tail = head; // rest tail to the beginning
 		movieList = movieList->next; //move to next movie node

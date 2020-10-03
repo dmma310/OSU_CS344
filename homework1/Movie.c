@@ -36,10 +36,8 @@ int main(int argc, char* argv[])
 		{
 			char* s = "Enter the year for which you want to see movies: ";
 			flushStdin();
-			int caseChoice = validateInputInt(s, 1000, 9999);
-			//printf("Enter the year for which you want to see movies: ");
-			//scanf("%d", caseChoice); // Assume valid user input
 			// No input validation needed
+			int caseChoice = validateInputInt(s, 1000, 9999);
 			int exists = 0;
 			// Loop through list and only print out matching year
 			struct movie* temp = list;
