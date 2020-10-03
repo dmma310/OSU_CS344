@@ -182,10 +182,16 @@ void flushStdin(void) {
 //
 //
 
+/*
+Movie: -^--
+tail:  ^--
+*/
+
+
 // Creates a linked list of <year, <title, rating>> nodes from a list of movie nodes. All years are unique with the highest rating stored for that year.
 struct keyValues* createKeysValueList(struct movie* list) {
 	int exists;
-	// Create first node in list
+	// Create first node in list, increment movie pointer to next node
 	struct keyValues* head = createKeysValue(list);
 	struct keyValues* tail = head;
 	struct movie* movieList = list->next;
@@ -195,7 +201,7 @@ struct keyValues* createKeysValueList(struct movie* list) {
 	while (movieList) {
 		exists = 0;
 		// Try to find matching/existing movie year, and replace with highest rating if needed
-		while (tail) {
+		while (tail->next) {
 			// If node with existing year exists, set highest rating
 			if (movieList->Year == tail->year) {
 				if (movieList->Rating > tail->titleRating.rating) {
@@ -205,8 +211,15 @@ struct keyValues* createKeysValueList(struct movie* list) {
 				exists = 1;
 				break;
 			}
-			//ISSUE: Once reaches end, tail becomes null. When creating new node below, how to reference last non-null node?
 			tail = tail->next;
+		}
+		// Loop above stops without checking last node (since tail->next == NULL). Need to check last node in tail list.
+		if (movieList->Year == tail->year) {
+			if (movieList->Rating > tail->titleRating.rating) {
+				tail->titleRating.title = movieList->Title;
+				tail->titleRating.rating = movieList->Rating;
+			}
+			exists = 1;
 		}
 		// Create new node and add to list since current year does not exist
 		if (!exists) {
