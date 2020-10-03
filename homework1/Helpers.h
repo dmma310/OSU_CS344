@@ -51,4 +51,5 @@ void freeMovie(struct movie*);
 void filterChar(char*, char*, char);
 void printMoviesByLanguage(struct movie*, char*);
 
+// Process languages string into separate language elements in an array.
 void processMovieLanguages(struct movie*, char*);

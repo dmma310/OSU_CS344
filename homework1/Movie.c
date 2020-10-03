@@ -23,17 +23,17 @@ int main(int argc, char* argv[])
 	//printf("%s\n", cwd);
 	//struct movie* list = processFile(cwd, &numLines);
 	struct movie* list = processFile(argv[1], &numLines);
-	//struct movie* x = list;
-	//printf("\n");
-	//while (x) {
-	//	printf("------------------\n");
-	//	printf("%s\n", x->Title);
-	//	printf("------------------\n");
-	//	for (int i = 0; i < x->numLanguages; ++i) {
-	//		printf("%s\n", x->Languages[i]);
-	//	}
-	//	x = x->next;
-	//}
+	struct movie* x = list;
+	printf("\n");
+	while (x) {
+		printf("------------------\n");
+		printf("%s\n", x->Title);
+		printf("------------------\n");
+		for (int i = 0; i < x->numLanguages; ++i) {
+			printf("%s\n", x->Languages[i]);
+		}
+		x = x->next;
+	}
 
 	printf("Processed file %s and parsed data for %d movies\n\n", argv[1], numLines);
 
