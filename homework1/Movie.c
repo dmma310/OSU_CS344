@@ -23,6 +23,17 @@ int main(int argc, char* argv[])
 	//printf("%s\n", cwd);
 	//struct movie* list = processFile(cwd, &numLines);
 	struct movie* list = processFile(argv[1], &numLines);
+	//struct movie* x = list;
+	//printf("\n");
+	//while (x) {
+	//	printf("------------------\n");
+	//	printf("%s\n", x->Title);
+	//	printf("------------------\n");
+	//	for (int i = 0; i < x->numLanguages; ++i) {
+	//		printf("%s\n", x->Languages[i]);
+	//	}
+	//	x = x->next;
+	//}
 
 	printf("Processed file %s and parsed data for %d movies\n\n", argv[1], numLines);
 
@@ -51,16 +62,15 @@ int main(int argc, char* argv[])
 			if (!exists) {
 				printf("No data about movies released in the year %d\n", caseChoice);
 			}
-			printf("\n");
 			break;
 		}
 		case ALL_MOVIES_BY_YEAR:
 		{
-			flushStdin();
+			//flushStdin();
 			struct keyValues* temp = createKeysValueList(list);
 			printKeysValue(temp);
 			freeKeysValue(temp);
-		break;
+			break;
 		}
 		case ALL_MOVIES_BY_LANGUAGE:
 		{
@@ -68,32 +78,15 @@ int main(int argc, char* argv[])
 			flushStdin();
 			printf("Enter the language for which you want to see movies: ");
 			scanf("%s", caseChoice);
-			// Find caseChoice (language) in file. If not found, printf:
-			// No input validation needed
-			// Exact match needed i.e. 'English' != 'english'
-			struct movie* temp = list;
-			int exists = 0;
-			while (temp != NULL) {
-				for (int i = 0; i < temp->numLanguages; ++i) {
-					if (strcmp(temp->Languages[i], caseChoice) == 0) {
-						printf("%d %s\n", temp->Year, temp->Title); // NEED TO PARSE THIS
-						exists = 1;
-						break;
-					}
-				}
-				temp = temp->next;
-			};
-			if (!exists) {
-				printf("No data about movies released in %s\n", caseChoice);
-			}
+			printMoviesByLanguage(list, caseChoice);
 			break;
-			printf("\n\n");
 		}
 		case 4:
 			break;
 		default:
 			break;
 		}
+		printf("\n");
 	} while (menuChoice != EXIT_PROGRAM);
 
 	// Free memory/

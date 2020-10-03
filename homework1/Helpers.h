@@ -48,4 +48,7 @@ void flushStdin(void);
 // Free memory of movies linked list
 void freeMovie(struct movie*);
 // Copy source to destination, with comparator char removed
-void filterChar(char* source, char* destination, char comparator);
+void filterChar(char*, char*, char);
+void printMoviesByLanguage(struct movie*, char*);
+
+void processMovieLanguages(struct movie*, char*);

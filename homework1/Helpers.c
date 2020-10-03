@@ -24,45 +24,48 @@ struct movie* createMovie(char* currLine) {
 	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Year = atoi(token);
 
-	// The next token processed. 
+	// The next token processed. Holds string of languages.
 	token = strtok_r(NULL, ",", &savePtr);
-	char* langPtr;
-	// Tokenize language array, which is in the following format: [language1<char*>;language2<char*>;...language5<char*>];Rating<double>
-	char* languageToken = strtok_r(token, ";", &langPtr);
-	int i = 0;
-	// Loop through each language, from 1 - 5 languages, and handle each case:
-	while (languageToken != NULL && i < MAX_LANGUAGES) {
-		currMovie->Languages[i] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[i]));
-		int s = strlen(languageToken) - 1;
-		// If one language, format is [some_language]
-		if (languageToken[0] == '[' && languageToken[s] == ']') {
-			// Copy from 2nd character on. Also don't copy last character.
-			memcpy(currMovie->Languages[i], &languageToken[1], s - 1);
-			break;
-		}
-		// 1st language being processed.
-		else if (languageToken[0] == '[') {
-			filterChar(languageToken, currMovie->Languages[i], '[');
-		}
-		// Last language being processed.
-		else if (languageToken[s] == ']') {
-			filterChar(languageToken, currMovie->Languages[i], ']');
-		}
-		// All other cases (processing languages in-between)
-		else {
-			strcpy(currMovie->Languages[i], languageToken);
-		}
-		languageToken = strtok_r(NULL, ";", &langPtr);
-		i += 1;
-	}
-	currMovie->numLanguages = i;
+	processMovieLanguages(currMovie, token);
+	//char* langPtr;
+	//// Tokenize language array, which is in the following format: [language1<char*>;language2<char*>;...language5<char*>]
+	//char* languageToken = strtok_r(token, ";", &langPtr);
+	//int languageIter = 0;
+	//// Loop through each language, from 1 - 5 languages, and handle each case:
+	//while (languageToken != NULL && languageIter < MAX_LANGUAGES) {
+	//	currMovie->Languages[languageIter] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[languageIter]));
+	//	int s = strlen(languageToken) - 1;
+	//	// If one language, format is [some_language]
+	//	if (languageToken[0] == '[' && languageToken[s] == ']') {
+	//		// Filter out beginning '[' and ending ']', null terminate, and xopy
+	//		char* langSavePtr;
+	//		char* lang = strtok_r(languageToken, "[", &langSavePtr);
+	//		lang = strtok_r(lang, "]", &langSavePtr);
+	//		lang[strlen(lang)] = '\0';
+	//		strcpy(currMovie->Languages[languageIter], lang);
+	//	}
+	//	// 1st language being processed.
+	//	else if (languageToken[0] == '[') {
+	//		filterChar(languageToken, currMovie->Languages[languageIter], '[');
+	//	}
+	//	// Last language being processed.
+	//	else if (languageToken[s] == ']') {
+	//		filterChar(languageToken, currMovie->Languages[languageIter], ']');
+	//	}
+	//	// All other cases (processing languages in-between)
+	//	else {
+	//		strcpy(currMovie->Languages[languageIter], languageToken);
+	//	}
+	//	languageToken = strtok_r(NULL, ";", &langPtr);
+	//	languageIter += 1;
+	//}
+	//currMovie->numLanguages = languageIter;
 	
-	// The last token processed. 
+	// The last token processed is a double.
 	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Rating = strtod(token, NULL);
 
 	currMovie->next = NULL;
-
 
 	return currMovie;
 };
@@ -110,7 +113,7 @@ struct movie* processFile(char* filePath, int* numLines)
 		struct movie* newNode = createMovie(currLine);
 
 		// Is this the first node in the linked list?
-		if (head == NULL)
+		if (!head)
 		{
 			// Set the head and the tail to this new node
 			head = newNode;
@@ -163,29 +166,6 @@ void flushStdin(void) {
 	int ch;
 	while (((ch = getchar()) != '\n') && (ch != EOF));
 }
-
-//
-///*
-//* Print data for the given movie. Need to pass in which column, then loop and only show column
-//*/
-//void printMovie(struct movie* aMovie) {
-//	printf("%s\n", aMovie->Year); // This needs to be parsed [xyz;abc;123]
-//}
-///*
-//* Print the linked list of movies
-//*/
-//void printMovieList(struct movie* list, char* field)
-//{
-//	while (list != NULL)
-//	{
-//		printMovie(list);
-//		list = list->next;
-//	}
-//}
-//
-//
-//
-//
 
 // Creates a linked list of <year, <title, rating>> nodes from a list of movie nodes. All years are unique with the highest rating stored for that year.
 struct keyValues* createKeysValueList(struct movie* list) {
@@ -261,3 +241,61 @@ void freeKeysValue(struct keyValues* list) {
 	}
 	list = NULL;
 };
+
+// Print all Movies with given language
+// Find caseChoice (language) in file. If not found, printf:
+// No input validation needed
+// Exact match needed i.e. 'English' != 'english'
+void printMoviesByLanguage(struct movie* list, char* lang) {
+	struct movie* temp = list;
+	int exists = 0;
+	while (temp != NULL) {
+		for (int i = 0; i < temp->numLanguages; ++i) {
+			if (strcmp(temp->Languages[i], lang) == 0) {
+				printf("%d %s\n", temp->Year, temp->Title);
+				exists = 1;
+				break;
+			}
+		}
+		temp = temp->next;
+	};
+	if (!exists) {
+		printf("No data about movies released in %s\n", lang);
+	}
+}
+
+void processMovieLanguages(struct movie* currMovie, char* token) {
+	char* langPtr;
+	// Tokenize language array, which is in the following format: [language1<char*>;language2<char*>;...language5<char*>]
+	char* languageToken = strtok_r(token, ";", &langPtr);
+	int languageIter = 0;
+	// Loop through each language, from 1 - 5 languages, and handle each case:
+	while (languageToken != NULL && languageIter < MAX_LANGUAGES) {
+		currMovie->Languages[languageIter] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[languageIter]));
+		int s = strlen(languageToken) - 1;
+		// If one language, format is [some_language]
+		if (languageToken[0] == '[' && languageToken[s] == ']') {
+			// Filter out beginning '[' and ending ']', null terminate, and xopy
+			char* langSavePtr;
+			char* lang = strtok_r(languageToken, "[", &langSavePtr);
+			lang = strtok_r(lang, "]", &langSavePtr);
+			lang[strlen(lang)] = '\0';
+			strcpy(currMovie->Languages[languageIter], lang);
+		}
+		// 1st language being processed.
+		else if (languageToken[0] == '[') {
+			filterChar(languageToken, currMovie->Languages[languageIter], '[');
+		}
+		// Last language being processed.
+		else if (languageToken[s] == ']') {
+			filterChar(languageToken, currMovie->Languages[languageIter], ']');
+		}
+		// All other cases (processing languages in-between)
+		else {
+			strcpy(currMovie->Languages[languageIter], languageToken);
+		}
+		languageToken = strtok_r(NULL, ";", &langPtr);
+		languageIter += 1;
+	}
+	currMovie->numLanguages = languageIter;
+}
