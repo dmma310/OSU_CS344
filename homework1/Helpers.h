@@ -1,6 +1,5 @@
 #define MAX_LANGUAGES 5
-
-// Structure to hold movie information
+// Structure to hold movie information.
 struct movie {
 	char* Title;
 	int Year;
@@ -12,45 +11,45 @@ struct movie {
 
 // Poor-man's map data structure. Will use an array of pair's. Better solution is to create a hash map with insert via hash function, etc.
 struct pair {
-	int year;
+	char* title;
 	double rating;
 };
 
-// Node used to hold movie with highest rating in given year
-struct keysValue{
-	char* title;
-	struct pair yearRating;
-	struct keysValue* next;
+// Used in linked list to store year with highest movie rating and its title
+struct keyValues {
+	int year;
+	struct pair titleRating;
+	struct keyValues* next;
 };
 
 // Creates a linked list of <year, <title, rating>> nodes from a list of movie nodes. All years are unique with the highest rating stored for that year.
-struct keysValue* createKeysValueList(struct movie* list);
+struct keyValues* createKeysValueList(struct movie* list);
 
 // Creates a <year, <title, rating>> struct from movie node
-struct keysValue* createKeysValue(struct movie* list);
+struct keyValues* createKeysValue(struct movie* list);
 
 // Display title and highest rating for each year
-void printKeysValue(struct keysValue* list);
+void printKeysValue(struct keyValues* list);
 
 // Frees the linked list of nodes containing <year, <title, rating>>
-void freeKeysValue(struct keysValue* list);
+void freeKeysValue(struct keyValues* list);
 
 // Process csv file and stores each record in a movie node.
 struct movie* processFile(char*, int*);
-
-// Create a movie node and return a pointer to it.
+// Create new movie node
 struct movie* createMovie(char*);
 
-// Copy all characters from source to destination except comparator
-void filterChar(char*, char*, char);
-
-// Validates user integer input bounds. Assumes valid integer input.
+// Used to validate user integer input. Assumes valid integer input.
 int validateInputInt(const char* menu, const int lbound, const int ubound);
 
-// Flush stdin buffer
+// Flush STDIN buffer
 void flushStdin(void);
 
-// Frees the array of character pointers (languages) in the movie structure
-void freeChars(struct movie*);
-// Frees the linked list of movie nodes
+// Free memory of movies linked list
 void freeMovie(struct movie*);
+// Copy source to destination, with comparator char removed
+void filterChar(char*, char*, char);
+void printMoviesByLanguage(struct movie*, char*);
+
+// Process languages string into separate language elements in an array.
+void processMovieLanguages(struct movie*, char*);
