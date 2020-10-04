@@ -1,1 +1,1 @@
-#OSU CS 344 HW1
+To run this program, extract all files in the same directory, then type in "make" to create the executable. Once compiled, run via "movie <csv_file_name.csv>", where csv_file_name.csv" is the name of the csv file you want to run the program to read and run with.
