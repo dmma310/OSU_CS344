@@ -23,17 +23,6 @@ int main(int argc, char* argv[])
 	//printf("%s\n", cwd);
 	//struct movie* list = processFile(cwd, &numLines);
 	struct movie* list = processFile(argv[1], &numLines);
-	struct movie* x = list;
-	printf("\n");
-	while (x) {
-		printf("------------------\n");
-		printf("%s\n", x->Title);
-		printf("------------------\n");
-		for (int i = 0; i < x->numLanguages; ++i) {
-			printf("%s\n", x->Languages[i]);
-		}
-		x = x->next;
-	}
 
 	printf("Processed file %s and parsed data for %d movies\n\n", argv[1], numLines);
 
@@ -46,7 +35,6 @@ int main(int argc, char* argv[])
 		case MOVIE_IN_ONE_YEAR:
 		{
 			char* s = "Enter the year for which you want to see movies: ";
-			flushStdin();
 			// No input validation needed
 			int caseChoice = validateInputInt(s, 1000, 9999);
 			int exists = 0;
@@ -66,7 +54,6 @@ int main(int argc, char* argv[])
 		}
 		case ALL_MOVIES_BY_YEAR:
 		{
-			//flushStdin();
 			struct keyValues* temp = createKeysValueList(list);
 			printKeysValue(temp);
 			freeKeysValue(temp);
@@ -75,7 +62,6 @@ int main(int argc, char* argv[])
 		case ALL_MOVIES_BY_LANGUAGE:
 		{
 			char caseChoice[20];
-			flushStdin();
 			printf("Enter the language for which you want to see movies: ");
 			scanf("%s", caseChoice);
 			printMoviesByLanguage(list, caseChoice);

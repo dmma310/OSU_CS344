@@ -112,7 +112,7 @@ void filterChar(char* source, char* destination, char comparator)
 	}
 	*destination = '\0'; // Null terminate
 	//char* langSavePtr;
-	//destination = strtok_r(source, comparator, &langSavePtr);
+	//destination = strtok_r(source, strcat(comparator, '\0'), &langSavePtr); // Compare needs to be double quotes "" (size 2, char + \0), not ''. 
 	//destination[strlen(destination)] = '\0';
 	//strcpy(currMovie->Languages[languageIter], lang);
 }
@@ -125,10 +125,11 @@ int validateInputInt(const char* menu, const int lbound, const int ubound) {
 	// Doesn't catch number then character such as 3a, only reads 3 and discards a
 	while (isValid == 0 || retVal < lbound || retVal > ubound) {
 		printf("\nYou entered an incorrect choice. Try again.\n\n");
+		flushStdin();
 		printf("%s", menu);
 		isValid = scanf("%d", &retVal);
-		flushStdin();
 	};
+	flushStdin();
 	return retVal;
 };
 
@@ -236,23 +237,17 @@ void printMoviesByLanguage(struct movie* list, char* lang) {
 
 // Process languages string into separate language elements in an array.
 void processMovieLanguages(struct movie* currMovie, char* token) {
+	int languageIter = 0;
 	char* langPtr;
 	// Tokenize language array, which is in the following format: [language1<char*>;language2<char*>;...language5<char*>]
 	char* languageToken = strtok_r(token, ";", &langPtr);
-	int languageIter = 0;
 	// Loop through each language, from 1 - 5 languages, and handle each case:
 	while (languageToken != NULL && languageIter < MAX_LANGUAGES) {
 		// Create character array for this language/
 		currMovie->Languages[languageIter] = calloc(strlen(languageToken) + 1, sizeof(currMovie->Languages[languageIter]));
 		int s = strlen(languageToken) - 1;
-		// If one language, format is [some_language]
+		// If one language, format is [some_language]. Filter out brackets
 		if (languageToken[0] == '[' && languageToken[s] == ']') {
-			// Filter out beginning '[' and ending ']', null terminate, and copy
-			//char* langSavePtr;
-			//char* lang = strtok_r(languageToken, '[', &langSavePtr);
-			//lang = strtok_r(lang, ']', &langSavePtr);
-			//lang[strlen(lang)] = '\0';
-			//strcpy(currMovie->Languages[languageIter], lang);
 			filterChar(languageToken, currMovie->Languages[languageIter], '[');
 			filterChar(currMovie->Languages[languageIter], currMovie->Languages[languageIter], ']');
 		}
