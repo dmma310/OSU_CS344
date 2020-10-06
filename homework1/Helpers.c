@@ -4,7 +4,7 @@
 #include "Helpers.h"
 
 
-// Create new movie node
+// Create & return new movie node
 struct movie* createMovie(char* currLine) {
 	struct movie* currMovie = malloc(sizeof(struct movie));
 	// Count number of languages.
@@ -12,23 +12,25 @@ struct movie* createMovie(char* currLine) {
 	// For use with strtok_r
 	char* savePtr;
 
-	// Read and tokenize the line. Expect the following format:
-	// Title<char*>;Year<int>;Languages[language1<char*>;language2<char*>;...language5<char*>];Rating<double>
+	/*
+	Read and tokenize the line. Expect the following format:
+	Title<char*>;Year<int>;Languages[language1<char*>;language2<char*>;...language5<char*>];Rating<double>
+	*/
 
-	// The first token processed. 
+	// Process and store the 1st token, which is the movie title.
 	char* token = strtok_r(currLine, ",", &savePtr);
 	currMovie->Title = calloc(strlen(token) + 1, sizeof(currMovie->Title)); // Needed if Title is a char*
 	strcpy(currMovie->Title, token);
 
-	// The next token processed. 
+	// Process and store the next token, which is the movie year. 
 	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Year = atoi(token);
 
-	// The next token processed. Holds string of languages.
+	// Process and store the next token, which is the string that contains all the languages. Store each language (as a char pointer)as an element in an array.
 	token = strtok_r(NULL, ",", &savePtr);
 	processMovieLanguages(currMovie, token);
-	
-	// The last token processed is a double.
+
+	// // Process and store the last token, which is the movie rating. 
 	token = strtok_r(NULL, ",", &savePtr);
 	currMovie->Rating = strtod(token, NULL);
 
@@ -44,7 +46,7 @@ void freeMovie(struct movie* list) {
 		temp = list;
 		list = list->next;
 		free(temp->Title);
-		//for (int i = 0; i < temp->numLanguages; ++i) {
+		// Free each language
 		for (int i = 0; i < MAX_LANGUAGES; ++i) {
 			free(temp->Languages[i]);
 		}
@@ -67,7 +69,7 @@ struct movie* processFile(char* filePath, int* numLines)
 	// The tail of the linked list
 	struct movie* tail = NULL;
 
-	// Ignore 1st row (header)
+	// Check if valid file, and then ignore 1st row (header)
 	len = 256;
 	if ((nread = getline(&currLine, &len, movieFile)) == -1) {
 		printf("Empty file\n");
@@ -93,6 +95,7 @@ struct movie* processFile(char* filePath, int* numLines)
 			tail->next = newNode;
 			tail = newNode;
 		}
+		// Count number of records
 		*numLines += 1;
 	}
 	free(currLine);
@@ -122,6 +125,7 @@ int validateInputInt(const char* menu, const int lbound, const int ubound) {
 	int retVal;
 	printf("%s", menu);
 	int isValid = scanf("%d", &retVal);
+	// Reprompt user until valid integer is entered.
 	// Doesn't catch number then character such as 3a, only reads 3 and discards a
 	while (isValid == 0 || retVal < lbound || retVal > ubound) {
 		printf("\nYou entered an incorrect choice. Try again.\n\n");
@@ -171,10 +175,11 @@ struct keyValues* createKeysValueList(struct movie* list) {
 				strcpy(tail->titleRating.title, movieList->Title);
 				tail->titleRating.rating = movieList->Rating;
 			}
-		} else {
-				// Create new node and add to list since current year does not exist
-				struct keyValues* newNode = createKeysValue(movieList);
-				tail->next = newNode;
+		}
+		else {
+			// Create new node and add to list since current year does not exist
+			struct keyValues* newNode = createKeysValue(movieList);
+			tail->next = newNode;
 		}
 		tail = head; // rest tail to the beginning
 		movieList = movieList->next; //move to next movie node

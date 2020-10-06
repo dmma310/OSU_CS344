@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 			// No input validation needed
 			int caseChoice = validateInputInt(s, 1000, 9999);
 			int exists = 0;
-			// Loop through list and only print out matching year
+			// Loop through movie list and only print out title with matching year
 			struct movie* temp = list;
 			while (temp != NULL) {
 				if (temp->Year == caseChoice) {
@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
 		}
 		case ALL_MOVIES_BY_YEAR:
 		{
+			// Create a new structure with the highest rated movie per year, then print and free the structure.
 			struct keyValues* temp = createKeysValueList(list);
 			printKeysValue(temp);
 			freeKeysValue(temp);
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])
 		}
 		case ALL_MOVIES_BY_LANGUAGE:
 		{
+			// Find and print all movies with the given language.
 			char caseChoice[20];
 			printf("Enter the language for which you want to see movies: ");
 			scanf("%s", caseChoice);
@@ -75,7 +77,7 @@ int main(int argc, char* argv[])
 		printf("\n");
 	} while (menuChoice != EXIT_PROGRAM);
 
-	// Free memory/
+	// Free memory
 	freeMovie(list);
 
 	return 0;
