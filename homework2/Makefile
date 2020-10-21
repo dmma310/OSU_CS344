@@ -1,24 +1,16 @@
 # Comprehensive Makefile
-<<<<<<< HEAD
-# This will automatically compile any .cpp files in the current directory.
-=======
 # This will automatically compile any .c files in the current directory.
->>>>>>> 6b9448e308d92dbbe12e3f20c1ce04ac197df1e3
 # Some of the syntax was adapted from:
 # https://gist.github.com/Wenchy/64db1636845a3da0c4c7
 # http://nuclear.mutantstargoat.com/articles/make/
 
-<<<<<<< HEAD
-CC = g++
-CFLAGS := -std=c++11
-=======
 CC = gcc
 CFLAGS = --std=gnu99
 SRCEXT = c
->>>>>>> 6b9448e308d92dbbe12e3f20c1ce04ac197df1e3
 
 BINDIR = .
 exe_file = $(BINDIR)/$(shell basename "${PWD}")
+#exe_file = movies_by_year
 
 # Handle debug case
 DEBUG ?= 1
@@ -30,10 +22,6 @@ endif
 
 SRCDIR = .
 BUILDDIR = build
-<<<<<<< HEAD
-SRCEXT = cpp
-=======
->>>>>>> 6b9448e308d92dbbe12e3f20c1ce04ac197df1e3
 SOURCES = $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 DEP = $(OBJECTS:.o=.d)
@@ -56,4 +44,3 @@ clean:
 	rm -rf $(BUILDDIR) $(exe_file)
 
 -include $(DEP)
-
