@@ -4,7 +4,7 @@
 /*
 * Checks whether we reached the stop delimiter, set the global stop_flag variable
 */
-int checkDelimiter(char* buffer) {
+int check_delimiter(char* buffer) {
 	// Check for STOP delimiter and set stop flag
 	if (strlen(buffer) == DELIMITER_LEN) {
 		if (strcmp(buffer, STOP_DELIMITER) == 0) {

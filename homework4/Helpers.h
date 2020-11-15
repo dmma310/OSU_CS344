@@ -20,15 +20,15 @@
 #define DELIMITER_LEN 5
 #define OUTPUT_SIZE 81
 
-int checkDelimiter(char*); // check for stop delimiter in file
+int check_delimiter(char*); // check for stop delimiter in file
 void get_buff_1(char*, char, char); // get contents from buffer 1
 void put_buff_1(char*); // put contents into buffer 1
 void get_buff_2(char*); // get contents from buffer 2
 void put_buff_2(char*); // put contents into buffer 2
 void put_buff_3(char*); // put contents into buffer 3
 
-void* inputFunction(void*);
-void* lineSeparatorFunction(void*);
-void* plusSignFunction(void*);
-void* outputFunction(void*);
-void produceOutput(char*); // get contents from buffer 3
+void* input_function(void*);
+void* line_separator_function(void*);
+void* plus_sign_function(void*);
+void* output_function(void*);
+void produce_output(char*); // get contents from buffer 3

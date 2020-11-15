@@ -40,19 +40,19 @@ pthread_cond_t has_item_3 = PTHREAD_COND_INITIALIZER;
 
 int main(int argc, char* argv[])
 {
-	pthread_t inputThread, lineSeparatorThread, plusSignThread, outputThread;
+	pthread_t input_thread, line_separator_thread, plus_sign_thread, output_thread;
 
 	// Create threads
-	pthread_create(&inputThread, NULL, inputFunction, NULL);
-	pthread_create(&lineSeparatorThread, NULL, lineSeparatorFunction, NULL);
-	pthread_create(&plusSignThread, NULL, plusSignFunction, NULL);
-	pthread_create(&outputThread, NULL, outputFunction, NULL);
+	pthread_create(&input_thread, NULL, input_function, NULL);
+	pthread_create(&line_separator_thread, NULL, line_separator_function, NULL);
+	pthread_create(&plus_sign_thread, NULL, plus_sign_function, NULL);
+	pthread_create(&output_thread, NULL, output_function, NULL);
 
 	// Join threads
-	pthread_join(inputThread, NULL);
-	pthread_join(lineSeparatorThread, NULL);
-	pthread_join(plusSignThread, NULL);
-	pthread_join(outputThread, NULL);
+	pthread_join(input_thread, NULL);
+	pthread_join(line_separator_thread, NULL);
+	pthread_join(plus_sign_thread, NULL);
+	pthread_join(output_thread, NULL);
 
 	return 0;
 }
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
  * Puts contents into shared buffer 1.
  * Sets stop flag when done.
 */
-void* inputFunction(void* args)
+void* input_function(void* args)
 {
 	/*
 	* Stop flag that is passed in shared buffer to other threads
@@ -75,7 +75,7 @@ void* inputFunction(void* args)
 	while (fgets(buffer, MAX_NUM_LINE_CHARS, stdin) && n++ < MAX_NUM_LINES && stop_flag != STOP_FLAG_INT_VAL) {
 		pthread_mutex_lock(&mutex_1);
 		// Check for stop flag in file and break out of loop as needed.
-		if ((stop_flag = checkDelimiter(buffer)) == STOP_FLAG_INT_VAL) {
+		if ((stop_flag = check_delimiter(buffer)) == STOP_FLAG_INT_VAL) {
 			pthread_cond_signal(&has_item_1);
 			pthread_mutex_unlock(&mutex_1);
 			break;
@@ -118,7 +118,7 @@ void get_buff_1(char* buffer, char currChar, char newChar)
 /*
  Function gets contents from shared buffer 1, replaces all '\n' with ' ', and places new contents into shared buffer 2.
 */
-void* lineSeparatorFunction(void* args)
+void* line_separator_function(void* args)
 {
 	char tmp_buff[MAX_NUM_LINES * MAX_NUM_LINE_CHARS] = { 0, };
 	// Continue consuming until the STOP_DELIMITER is seen and no more items to consume
@@ -126,7 +126,7 @@ void* lineSeparatorFunction(void* args)
 	{
 		// Lock mutex_1 before checking waiting until the shared buffer has data.      
 		pthread_mutex_lock(&mutex_1);
-		// Wait until there is an item in shared buffer 1 (inputFunction signals this).
+		// Wait until there is an item in shared buffer 1 (input_function signals this).
 		while (count_1 <= 0) {
 			pthread_cond_wait(&has_item_1, &mutex_1);
 		}
@@ -167,7 +167,7 @@ void get_buff_2(char* buffer)
 /*
  Function gets contents from shared buffer 2, replaces all '++' with '^', and places new contents into shared buffer 3.
 */
-void* plusSignFunction(void* args)
+void* plus_sign_function(void* args)
 {
 	char tmp_buff[MAX_NUM_LINES * MAX_NUM_LINE_CHARS] = { 0, };
 	// Continue consuming until the STOP_DELIMITER is seen and no more items to consume.
@@ -217,7 +217,7 @@ void put_buff_3(char* buffer)
 /*
  Function gets contents from shared buffer 3 into temp buffer, and writes to stdout 80 characters (plus \n) at a time.
 */
-void* outputFunction(void* args) {
+void* output_function(void* args) {
 	char buff[MAX_NUM_LINES * MAX_NUM_LINE_CHARS] = { 0, };
 	while (1) {
 		pthread_mutex_lock(&mutex_3);
@@ -225,7 +225,7 @@ void* outputFunction(void* args) {
 		while (count_3 <= 0) {
 			pthread_cond_wait(&has_item_3, &mutex_3);
 		}
-		produceOutput(buff);
+		produce_output(buff);
 		pthread_mutex_unlock(&mutex_3);
 
 		// Check buffer for stop flag, and break out of loop as needed.
@@ -237,7 +237,7 @@ void* outputFunction(void* args) {
 }
 
 // Get contents from shared_buffer_3, writes to stdout if needed, and updates count 3
-void produceOutput(char* buffer)
+void produce_output(char* buffer)
 {
 	char oBuff[OUTPUT_SIZE] = { 0, };
 	buffer[cons_idx_3++] = shared_buffer_3[output_idx_3++];
