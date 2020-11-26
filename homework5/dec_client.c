@@ -5,8 +5,8 @@ int main(int argc, char* argv[]) {
     struct sockaddr_in server_address;
     char cipher_text[FULL_MSG_SIZE] = { 0, };
     char key_text[FULL_MSG_SIZE] = { 0, };
-    char buffer[FULL_MSG_SIZE];
-    char full_plain_msg[FULL_MSG_SIZE];
+    char* buffer;
+    char* full_plain_msg;
     int is_reusable = 1, rd_len = strlen(SVR_ALLOW_MSG);
 
 
@@ -62,45 +62,51 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "CLIENT: ERROR writing to socket\n");
         exit(1);
     }
+    int file_len = num_cipher_text_chars + num_key_text_chars + 2; // Add 2 for \n after each file
+    buffer = calloc(file_len, sizeof(char));
     if (readall(socket_fd, buffer, rd_len) == -1) {
         close(socket_fd);
-        fprintf(stderr, "CLIENT: ERROR reading from socket\n");
+        fprintf(stderr, "CLIENT: ERROR reading 1 from socket\n");
+        free(buffer);
         exit(1);
     }
 
     if (strcmp(buffer, SVR_BAD_PORT_MSG) == 0 || strcmp(buffer, SVR_ALLOW_MSG) != 0) { //check if allowed to connect.
         close(socket_fd);
         fprintf(stderr, "Error: could not contact %s on port %d\n", DEC_SVR, atoi(argv[3]));
+        free(buffer);
         exit(2);
     }
 
     /*****************Send file length*****************/
     // Send file length
-    int file_len = num_cipher_text_chars + num_key_text_chars + 2; // Add 2 for \n after each file
-    memset(buffer, 0, FULL_MSG_SIZE);
+    memset(buffer, 0, strlen(buffer));
     sprintf(buffer, "%d", file_len);
     if (sendall(socket_fd, buffer, &file_len) == -1) {
         close(socket_fd);
         fprintf(stderr, "CLIENT: ERROR writing to socket\n");
+        free(buffer);
         exit(1);
     }
-    memset(buffer, 0, FULL_MSG_SIZE);
+    memset(buffer, 0, strlen(buffer));
 
     // Wait for ok response from server
     if (readall(socket_fd, buffer, rd_len) == -1) {
         close(socket_fd);
-        fprintf(stderr, "CLIENT: ERROR reading from socket\n");
+        fprintf(stderr, "CLIENT: ERROR reading 2 from socket\n");
+        free(buffer);
         exit(1);
     }
 
     if (strcmp(buffer, SVR_BAD_PORT_MSG) == 0 || strcmp(buffer, SVR_ALLOW_MSG) != 0) { //check if allowed to         close(socket_fd);
         fprintf(stderr, "Error: could not contact %s on port %d\n", DEC_SVR, atoi(argv[3]));
+        free(buffer);
         exit(2);
     }
 
     /*****************Send file contents*****************/
     // Send single file with contents <plain_text>\n<key_text\0>\n
-    memset(buffer, 0, FULL_MSG_SIZE);
+    memset(buffer, 0, strlen(buffer));
     strcat(buffer, cipher_text);
     strcat(buffer, "\n");
     strcat(buffer, key_text);
@@ -109,17 +115,22 @@ int main(int argc, char* argv[]) {
     if (sendall(socket_fd, buffer, &file_len) == -1) {
         close(socket_fd);
         fprintf(stderr, "CLIENT: ERROR writing to socket\n");
+        free(buffer);
         exit(1);
     }
     /*****************Get plain text message from server*****************/
     rd_len = num_cipher_text_chars + 1;
+    full_plain_msg = calloc(rd_len + 1, sizeof(char));
     if (readall(socket_fd, full_plain_msg, rd_len) == -1) {
         close(socket_fd);
-        fprintf(stderr, "CLIENT: ERROR reading from socket\n");
+        fprintf(stderr, "CLIENT: ERROR reading 3 from socket\n");
+        free(buffer);
+        free(full_plain_msg);
         exit(1);
     }
     printf(full_plain_msg); // Send full plain text message to stdout
-
+    free(buffer);
+    free(full_plain_msg);
     // Close the socket
     close(socket_fd);
     return 0;

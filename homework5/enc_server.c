@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
         if ((connected_client_fd = accept(listen_socket_fd, (struct sockaddr*)&client_address, &size_of_client_info)) < 0) {
             close(listen_socket_fd);
             fprintf(stderr, "SERVER: ERROR cannot accept\n");
-            exit(1);
+            continue;
         }
 
         // Use child to process request
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
             {
                 close(listen_socket_fd);
                 fprintf(stderr, "SERVER: ERROR could not fork.\n");
-                exit(1);
+                continue;
             }
             // Inside child process
             case 0:
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
                 /*****************Check correct client connecting*****************/
                 // Check whether correct client is connecting or not, and send response.
                 if (readall(connected_client_fd, buffer, cli_id_len) == -1) {
+                    close(connected_client_fd);
                     exit(1);
                 }
 
@@ -74,12 +75,16 @@ int main(int argc, char* argv[]) {
                     int len = strlen(SVR_BAD_PORT_MSG);
                     if (sendall(connected_client_fd, SVR_BAD_PORT_MSG, &len) == -1) {
                         fprintf(stderr, "SERVER: ERROR cannot write to client\n");
+                        close(connected_client_fd);
+                        exit(1);
                     }
                     exit(1);
                 }
                 // Everything is ok to proceed, so send ok response to client
                 if ((sendall(connected_client_fd, SVR_ALLOW_MSG, &ok_len)) == -1) {
                     fprintf(stderr, "SERVER: ERROR cannot write to client\n");
+                    close(connected_client_fd);
+                    exit(1);
                 }
                 // Get length of plain text + key file
                 memset(buffer, 0, FULL_MSG_SIZE);
@@ -94,11 +99,14 @@ int main(int argc, char* argv[]) {
                 // Tell client to proceed
                 if ((sendall(connected_client_fd, SVR_ALLOW_MSG, &ok_len)) == -1) {
                     fprintf(stderr, "SERVER: ERROR cannot write to client\n");
+                    close(connected_client_fd);
+                    exit(1);
                 }
                 memset(buffer, 0, FULL_MSG_SIZE);
 
                 /*****************Get plain text + key text*****************/
                 if (readall(connected_client_fd, buffer, buffer_len) == -1) {
+                    close(connected_client_fd);
                     exit(1);
                 }
                 /*****************Process plain text and key text*****************/
@@ -116,6 +124,8 @@ int main(int argc, char* argv[]) {
                 int encrypt_msg_len = strlen(full_encrypted_msg);
                 if ((sendall(connected_client_fd, full_encrypted_msg, &encrypt_msg_len)) == -1) {
                     fprintf(stderr, "SERVER: ERROR cannot write to client\n");
+                    close(connected_client_fd);
+                    exit(1);
                 }
                 exit(0);
             }

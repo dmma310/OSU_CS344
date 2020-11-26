@@ -49,7 +49,7 @@ int get_file(char* storage_arr, const char* file_name) {
     for (char c = getc(fp); c != EOF && c != '\n'; c = getc(fp)) {
         if (!isupper(c) && c != ' ') {
             fclose(fp);
-            memset(storage_arr, 0, FULL_MSG_SIZE);
+            memset(storage_arr, 0, strlen(storage_arr));
             return -1;
         }
         storage_arr[count++] = c;

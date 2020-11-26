@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
         if ((connected_client_fd = accept(listen_socket_fd, (struct sockaddr*)&client_address, &size_of_client_info)) < 0) {
             close(listen_socket_fd);
             fprintf(stderr, "SERVER: ERROR cannot accept\n");
-            exit(1);
+            continue;
         }
 
         // Use child to process request
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         {
             close(listen_socket_fd);
             fprintf(stderr, "SERVER: ERROR could not fork.\n");
-            exit(1);
+            continue;
         }
         // Inside child process
         case 0:
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
         default:
         {
             // Reap zombie process
-            pid_t actual_pid = waitpid(pid, &pid_status, WNOHANG);
+            pid_t actual_pid = waitpid(-1, &pid_status, WNOHANG);
         }
         }
         close(connected_client_fd);

@@ -11,8 +11,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define FULL_MSG_SIZE 200000
-#define TMP_BUFF_SIZE 1024
+#define FULL_MSG_SIZE 140010
+#define TMP_BUFF_SIZE 140010
 #define SVR_ALLOW_MSG "ok"
 #define SVR_BAD_PORT_MSG "@@"
 #define MAX_SERVER_CONNECTIONS 5
