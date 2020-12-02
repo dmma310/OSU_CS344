@@ -169,6 +169,7 @@ fn main() {
     let xs2 = partition_data(num_partitions, &v);
     print_partition_info(&xs2);
     let mut children2 = vec![];
+    // Create one thread per partition for processing a chunk
     for data_segment in xs2{
         children2.push(thread::spawn(move || -> usize {
             // Calculate the intermediate sum of this segment
@@ -209,25 +210,27 @@ fn main() {
 * 
 */
 fn partition_data(num_partitions: usize, v: &Vec<usize>) -> Vec<Vec<usize>>{
+    use std::iter::FromIterator;
     let mut xs: Vec<Vec<usize>> = Vec::new();
     let partition_size: usize = v.len() / num_partitions; // size of each partition
     let mut idx: usize = 0; // keep track of where you are in vector
-    let mut partition_sizes = vec![partition_size; num_partitions]; // how to initiate with partition size and num partitions??
+    let mut partition_sizes = vec![partition_size; num_partitions]; // create list of equal partition sizes
+    /*
+    If number of elements not a multiple of number of partitions, loop through each partition size and add 1 until we cover the entire length of the input vector. This ensures that no partition size differ by more than 1.
+    */
     let remainder: usize = v.len() % num_partitions;
     for i in 0..remainder{
         partition_sizes[i % num_partitions] += 1;
     }
-    println!("Elements to partions: {:?}\nPartition sizes: {:?}", v, partition_sizes);
 
+    /*
+    Clone partial content from vector for each partition size
+    Source: https://users.rust-lang.org/t/efficient-way-of-copying-partial-content-from-vector/8317
+    */
     for partition in partition_sizes.iter(){
-        let mut x : Vec<usize> = Vec::new(); // Create vector of integers
-        for i in 0..*partition{
-            x.push(v[i] + idx);
-        }
-        println!("Partition contents: {:?}", x);
-        idx += *partition;
-        xs.push(x);
-        // println!{"Overall contents: {:?}", xs};
+        let x = Vec::from_iter(v[idx..idx + *partition].iter().cloned());
+        idx += *partition; // Update start index
+        xs.push(x); // Add vector to vector of vectors
     }
     xs
 }
