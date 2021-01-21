@@ -1,9 +1,9 @@
-To run this program, extract all files in the same directory, then type in "make" to create the executable. Once compiled, run via "movie <csv_file_name.csv>", where csv_file_name.csv" is the name of the csv file you want to run the program to read and run with.
+# To run this program, extract all files in the same directory, then type in "make" to create the executable. Once compiled, run via "movie <csv_file_name.csv>", where csv_file_name.csv" is the name of the csv file you want to run the program to read and run with.
 
-Introduction
+## Introduction
 In this assignment, you'll write a program that will introduce you to programming in C on UNIX based systems.
 
-Learning Outcomes
+## Learning Outcomes
 How to write a C program to solve a problem? (Module 1 MLO 4)
 How do you interact with the user in C programs? (Module 1 MLO 6)
 How are C programs transformed into an executable form? (Module 1 MLO 7)
@@ -13,7 +13,7 @@ What are pointers and how is this mechanism supported in C? ((Module 2 MLO 4)
 Describe memory allocation in Unix (Module 2 MLO 5)
 Explain how to create and manipulate strings in C (Module 2 MLO 6)
 
-Instructions
+## Instructions
 Write a program that:
 Reads a CSV file with movie data that is provided to the program as an argument
 Processes the data in the file to create structs to hold data for each movie
@@ -28,13 +28,13 @@ All other rows have the same format and no columns are missing in any row.
 Commas appear as delimiters between columns, but will not appear in the values of any columns.
 This file has the following columns:
 
-Title
+#### Title
 This is a string with the movie title.
 E.g., Iron Man 2
-Year
+#### Year
 This is a 4 digit integer value for the year the movie was released
 E.g., 2010
-Languages
+#### Languages
 The language or languages in which the movie was released.
 One or more string values that are always enclosed within []
 Multiple values are separated by semi-colons.
@@ -44,13 +44,13 @@ E.g,
 [English]
 You can assume that the maximum number of languages any movie can be released in is 5.
 You can assume that the maximum length of a language string is 20 characters.
-Rating Value
+#### Rating Value
 A number between 1 and 10 (inclusive of both 1 and 10)
 It can be an integer or a double with one digit after the decimal point
 E.g.,
 5
 8.7
-Program Functionality
+## Program Functionality
 Process the input file
 When your program starts it must read all data from the file and process it. After processing the file, the program must print the following message to stdout
 
@@ -60,7 +60,7 @@ where XYZ is the name of the file that has been process and M is the number of m
 
 E.g., Processed file movie_sample_1.csv and parsed data for 24 movies
 
-Interactive Functionality
+## Interactive Functionality
 Next your program should display a menus of interactive choices to the user and process the selected choice as described below. For the text of messages to print, see the section "Sample Program Execution."
 
 1. Show movies release in the specified year
@@ -87,7 +87,7 @@ If the data doesn't include any movie released in this language, print a message
 4. Exit
 
 If the user choose this option, the program should exit.
-Notes:
+## Notes:
 
 You can assume that when the program asks user to enter an integer, the user will indeed enter an integer (i.e., you don't need to verify the data type of the user input).
 For the interaction choice if  the user enters an incorrect integer (i.e., something other than 1 to 4), print an error message and again present the 4 choices to the user. 
@@ -100,14 +100,10 @@ Create a struct called movie with the data for that line
 Create a linked list containing all the movie structures
 In the Resources Section we have provided sample code that you can adapt to meet these technical requirements.
 
-Sample Program Execution
+## Sample Program Execution
 Here is a complete example of executing the assignment with the provided sample CSV file.
 
-Correction (Sep 28): The assignment description asks ratings to be displayed with 1 decimal point. But the sample output displays movie ratings with 2 decimal points. This is an error in the sample output. Given that some of you may already have coded the assignment, we will accept movie ratings displayed with either 1 or 2 decimal points (so it is your choice).
-
- 
-
-$ ./movies movie_sample_1.csv 
+<pre><code>$ ./movies movie_sample_1.csv 
 Processed file movie_sample_1.csv and parsed data for 24 movies
 
 1. Show movies released in the specified year
@@ -204,4 +200,4 @@ You entered an incorrect choice. Try again.
 4. Exit from the program
 
 Enter a choice from 1 to 4: 4
-$
+$<pre></code>
