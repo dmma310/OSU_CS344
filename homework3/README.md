@@ -179,7 +179,7 @@ background pid is 4963
 : date
  Mon Jan 2 11:24:39 PST 2017
 : exit
-$<pre></code>
+$</code><pre>
 
 
 ## Hints & Resources
@@ -247,13 +247,10 @@ Here is the grading script p3testscript. It is a bash script that starts the sma
 
 To run the script, place it in the same directory as your compiled shell, chmod it (chmod +x ./p3testscript) and run this command from a bash prompt:
 
-$ ./p3testscript 2>&1
+<pre><code>$ ./p3testscript 2>&1</code><pre>
 or
 
-$ ./p3testscript 2>&1 | more
+<pre><code>$ ./p3testscript 2>&1 | more</code><pre>
 or
 
-$ ./p3testscript > mytestresults 2>&1 
-Do not worry if the spacing, indentation, or look of the output of the script is different than when you run it interactively: that won’t affect your grade. The script may add extra colons at the beginning of lines or do other weird things, like put output about terminating processes further down the script than you intended. 
-
-If your program does not work with the grading script, and you instead request that we grade your script by hand, we will apply a 15% reduction to your final score. So from the very beginning, make sure that you work with the grading script on our class server!
+<pre><code>$ ./p3testscript > mytestresults 2>&1 </code><pre>
