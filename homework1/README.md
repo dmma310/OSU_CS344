@@ -1,4 +1,4 @@
-# To run this program, extract all files in the same directory, then type in "make" to create the executable. Once compiled, run via "movie <csv_file_name.csv>", where csv_file_name.csv" is the name of the csv file you want to run the program to read and run with.
+** To run this program, extract all files in the same directory, then type in "make" to create the executable. Once compiled, run via "movie <csv_file_name.csv>", where csv_file_name.csv" is the name of the csv file you want to run the program to read and run with. **
 
 ## Introduction
 In this assignment, you'll write a program that will introduce you to programming in C on UNIX based systems.
