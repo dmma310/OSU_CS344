@@ -179,7 +179,7 @@ background pid is 4963
 : date
  Mon Jan 2 11:24:39 PST 2017
 : exit
-$</code><pre>
+$</pre></code>
 
 
 ## Hints & Resources
@@ -247,10 +247,10 @@ Here is the grading script p3testscript. It is a bash script that starts the sma
 
 To run the script, place it in the same directory as your compiled shell, chmod it (chmod +x ./p3testscript) and run this command from a bash prompt:
 
-<pre><code>$ ./p3testscript 2>&1</code><pre>
+<pre><code>$ ./p3testscript 2>&1</pre></code>
 or
 
-<pre><code>$ ./p3testscript 2>&1 | more</code><pre>
+<pre><code>$ ./p3testscript 2>&1 | more</pre></code>
 or
 
-<pre><code>$ ./p3testscript > mytestresults 2>&1 </code><pre>
+<pre><code>$ ./p3testscript > mytestresults 2>&1</pre></code>
