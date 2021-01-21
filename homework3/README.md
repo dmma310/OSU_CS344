@@ -1,7 +1,7 @@
-Introduction
+## Introduction
 In this assignment you will write smallsh your own shell in C. smallsh will implement a subset of features of well-known shells, such as bash. Your program will
 
-Provide a prompt for running commands
+## Provide a prompt for running commands
 Handle blank lines and comments, which are lines beginning with the # character
 Provide expansion for the variable $$
 Execute 3 commands exit, cd, and status via code built into the shell
@@ -10,7 +10,7 @@ Support input and output redirection
 Support running commands in foreground and background processes
 Implement custom handlers for 2 signals, SIGINT and SIGTSTP
 
-Program Functionality
+## Program Functionality
 1. The Command Prompt
 Use the colon : symbol as a prompt for each command line. 
 
@@ -44,7 +44,7 @@ If the user tries to run one of these built-in commands in the background with t
 exit
 The exit command exits your shell. It takes no arguments. When this command is run, your shell must kill any other processes or jobs that your shell has started before it terminates itself.
 
-cd
+### cd
 The cd command changes the working directory of smallsh.
 
 By itself - with no arguments - it changes to the directory specified in the HOME environment variable
@@ -70,10 +70,10 @@ An input file redirected via stdin should be opened for reading only; if your sh
 Similarly, an output file redirected via stdout should be opened for writing only; it should be truncated if it already exists or created if it does not exist. If your shell cannot open the output file it should print an error message and set the exit status to 1 (but don't exit the shell).
 Both stdin and stdout for a command can be redirected at the same time (see example below).
 7. Executing Commands in Foreground & Background
-Foreground Commands
+### Foreground Commands
 Any command without an & at the end must be run as a foreground command and the shell must wait for the completion of the command before prompting for the next command. For such commands, the parent shell does NOT return command line access and control to the user until the child terminates.
 
-Background Commands
+### Background Commands
 Any non built-in command with an & at the end must be run as a background command and the shell must not wait for such a command to complete. For such commands, the parent must return command line access and control to the user immediately after forking off the child.
 
 The shell will print the process id of a background process when it begins.
@@ -81,7 +81,7 @@ When a background process terminates, a message showing the process id and exit 
 If the user doesn't redirect the standard input for a background command, then standard input should be redirected to /dev/null
 If the user doesn't redirect the standard output for a background command, then standard output should be redirected to /dev/null
 8. Signals SIGINT & SIGTSTP
-SIGINT
+### SIGINT
 A CTRL-C command from the keyboard sends a SIGINT signal to the parent process and all children at the same time (this is a built-in part of Linux).
 
 Your shell, i.e., the parent process, must ignore SIGINT
@@ -89,7 +89,7 @@ Any children running as background processes must ignore SIGINT
 A child running as a foreground process must terminate itself when it receives SIGINT
 The parent must not attempt to terminate the foreground child process; instead the foreground child (if any) must terminate itself on receipt of this signal.
 If a child foreground process is killed by a signal, the parent must immediately print out the number of the signal that killed it's foreground child process (see the example) before prompting the user for the next command.
-SIGTSTP
+### SIGTSTP
 A CTRL-Z command from the keyboard sends a SIGTSTP signal to your parent shell process and all children at the same time (this is a built-in part of Linux).
 
 A child, if any, running as a foreground process must ignore SIGTSTP.
@@ -105,10 +105,10 @@ See the example below for usage and the exact syntax which you must use for thes
 
 
 
-Sample Program Execution
+## Sample Program Execution
 Here is an example run using smallsh. Note that CTRL-C has no effect towards the bottom of the example, when it's used while sitting at the command prompt:
 
-$ smallsh
+<pre><code>$ smallsh
 : ls
 junk   smallsh    smallsh.c
 : ls > junk
@@ -179,10 +179,10 @@ background pid is 4963
 : date
  Mon Jan 2 11:24:39 PST 2017
 : exit
-$
+$<pre></code>
 
 
-Hints & Resources
+## Hints & Resources
 1. The Command Prompt
 Be sure you flush out the output buffers each time you print, as the text that you're outputting may not reach the screen until you do in this kind of interactive program. To do this, call fflush() immediately after each and every time you output text.
 
@@ -241,12 +241,6 @@ The time to print out when these background processes have completed is just BEF
 
 8. Signals SIGINT & SIGTSTP
 Reentrancy is important when we consider that signal handlers cause jumps in execution that cause problems with certain functions. Note that the printf() family of functions is NOT reentrant. In your signal handlers, when outputting text, you must use other output functions!
-
-
-Grading Criteria
-This assignment is worth 20% of your grade and there are 180 points available for it. 170 points are available in the test script, while the final 10 points will be based on your style, readability, and commenting. Comment well, often, and verbosely: we want to see that you are telling us WHY you are doing things, in addition to telling us WHAT you are doing.
-
-Once the program is compiled, according to your specifications given in README.txt, your shell will be executed to run a few sample commands against (ls, status, exit, in that order). If the program does not successfully work on those commands, it will receive a zero. If it works, then the grading script will be run against it (as detailed below) for final grading. Points will be assigned according to the grading script running on our class server only.
 
 Grading Method
 Here is the grading script p3testscript. It is a bash script that starts the smallsh program and runs commands on smallsh's command line. Most of the commands run by the grading script are very similar to the commands shown in the section Sample Program Execution. You can open the script in a text editor. The comments in the script will show you the points for individual items. Use the script to prepare for your grade, as this is how it's being earned.
